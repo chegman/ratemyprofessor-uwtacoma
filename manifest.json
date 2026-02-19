@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "RateMyProf UW Assistant",
+  "version": "1.0",
+  "description": "Shows professor reviews and ratings on MyPlan",
+  "permissions": [
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://myplan.uw.edu/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://myplan.uw.edu/*"],
+      "js": ["content.js"],
+      "css": ["popup.css"]
+    }
+  ]
+}
