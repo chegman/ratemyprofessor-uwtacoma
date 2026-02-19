@@ -7,6 +7,7 @@ Run:  uvicorn main:app --reload --port 8000
 import os
 import re
 import logging
+import asyncio
 import requests
 from typing import List, Optional
 
@@ -40,8 +41,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ── Keep alive ───────────────────────────────────────────────
+@app.on_event("startup")
+async def keep_alive():
+    async def ping():
+        while True:
+            await asyncio.sleep(300)  # every 5 minutes
+            logger.info("Keep alive ping")
+    asyncio.create_task(ping())
 
-# ── Pydantic Models ──────────────────────────────────────────
+
+# ── Data Models ──────────────────────────────────────────────
 class Review(BaseModel):
     rating: float
     text: str
@@ -101,6 +111,7 @@ def search_professor(name: str) -> Optional[dict]:
     if not rated:
         return None
 
+    # Must match at least first and last name
     name_parts = name.lower().split()
     for prof in rated:
         first = prof['firstName'].lower().strip()
@@ -108,6 +119,7 @@ def search_professor(name: str) -> Optional[dict]:
         if last in name_parts and first in name_parts:
             return prof
 
+    # No confident match found — return nothing rather than guess wrong
     return None
 
 
@@ -173,7 +185,6 @@ Keep the summary under 60 words. Do not use bullet points. Write in plain paragr
 
 
 def is_abusive(text: str) -> bool:
-    """Use Claude to check if a review contains abusive or inappropriate content."""
     if not anthropic_client:
         return False
     try:
@@ -193,7 +204,6 @@ def is_abusive(text: str) -> bool:
 
 
 def summarize_reviews(review_texts: List[str]) -> str:
-    """Use Claude Haiku to generate an AI summary of the reviews."""
     if not anthropic_client or not review_texts:
         return _fallback_summary(review_texts)
 
