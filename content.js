@@ -3,7 +3,7 @@
 // Integrated: API calls, error handling, data display
 // ============================================================
 
-const BACKEND_URL = 'http://localhost:8000'; // Change to deployed backend URL when ready
+const BACKEND_URL = 'https://railway.com/project/15da4a34-16af-428b-ba63-566949185920?environmentId=a9f63cc4-4aae-462a-b8f7-20d9825df699'; // Change to deployed backend URL when ready
 const API_TIMEOUT_MS = 10000;               // 10-second timeout
 
 let currentPopup = null;
